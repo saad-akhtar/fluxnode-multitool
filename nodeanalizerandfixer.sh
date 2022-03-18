@@ -157,19 +157,19 @@ fi
 
 
 if sudo lsof -i  -n | grep LISTEN | grep 27017 | grep mongod > /dev/null 2>&1; then
-echo -e "${CHECK_MARK} ${CYAN} Mongod listen on port 27017${NC}"
+echo -e "${CHECK_MARK} ${CYAN} Mongod is listening on port 27017${NC}"
 else
-echo -e "${X_MARK} ${CYAN} Mongod not listen${NC}"
+echo -e "${X_MARK} ${CYAN} Mongod not listening${NC}"
 fi
 
 if sudo lsof -i  -n | grep LISTEN | grep 16125 | grep fluxd > /dev/null 2>&1; then
-echo -e "${CHECK_MARK} ${CYAN} Flux daemon listen on port 16125${NC}"
+echo -e "${CHECK_MARK} ${CYAN} Flux daemon is listening on port 16125${NC}"
 else
 
     if sudo lsof -i  -n | grep LISTEN | grep 16125 | grep zelcashd > /dev/null 2>&1; then
-        echo -e "${CHECK_MARK} ${CYAN} Flux daemon listen on port 16125${NC}"
+        echo -e "${CHECK_MARK} ${CYAN} Flux daemon is listening on port 16125${NC}"
     else
-        echo -e "${X_MARK} ${CYAN} Flux daemon not listen${NC}"
+        echo -e "${X_MARK} ${CYAN} Flux daemon is not listening${NC}"
     fi
     
 fi
@@ -181,9 +181,9 @@ fi
 #fi
 
 if sudo lsof -i  -n | grep LISTEN | grep 16224 | grep bench > /dev/null 2>&1; then
-echo -e "${CHECK_MARK} ${CYAN} Flux benchmark listen on port 16224${NC}"
+echo -e "${CHECK_MARK} ${CYAN} Flux benchmark listening on port 16224${NC}"
 else
-echo -e "${X_MARK} ${CYAN} Flux benchmark not listen${NC}"
+echo -e "${X_MARK} ${CYAN} Flux benchmark is not listening${NC}"
 fi
 
 if sudo lsof -i  -n | grep LISTEN | grep 16126 | grep node > /dev/null 2>&1 
@@ -198,9 +198,9 @@ fi
 
 if [[ "$ZELFLUX_PORT1" == "1" && "$ZELFLUX_PORT2" == "1"  ]]
 then
-echo -e "${CHECK_MARK} ${CYAN} Flux listen on ports 16126/16127${NC}"
+echo -e "${CHECK_MARK} ${CYAN} Flux listening on ports 16126/16127${NC}"
 else
-echo -e "${X_MARK} ${CYAN} Flux not listen${NC}"
+echo -e "${X_MARK} ${CYAN} Flux is not listening ${NC}"
 fi
 
 }
@@ -286,7 +286,7 @@ function check_benchmarks() {
 if [[ "$USER" == "root" ]]
 then
     echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user accont.${NC}"
+    echo -e "${CYAN}Please switch to the docker user accont.${NC}"
     echo -e "${YELLOW}================================================================${NC}"
     echo -e "${NC}"
     exit
@@ -374,7 +374,7 @@ if [[ "$usercheck" =~ "," ]]; then
 echo -e ""
 echo -e "${WORNING} ${CYAN} Detected multiple users in docker group...${NC}"
 echo -e "${WORNING} ${CYAN} More then one instance of flux daemon will cause it to malfunction...${NC}"
-echo -e "${WORNING} ${CYAN} If u installed FluxOS on more then one user you need delete one instance of it...${NC}"
+echo -e "${WORNING} ${CYAN} If you installed FluxOS as more than one user you will need delete one instance of it...${NC}"
 echo -e "${WORNING} ${CYAN} To check the list of users type: getent group docker ${NC}"
 echo -e "${WORNING} ${CYAN} To remove unwanted users type: sudo deluser --remove-home user_name ${NC}"
 echo -e "${WORNING} ${CYAN} To reboot server type: sudo reboot -n ${NC}"
@@ -424,7 +424,7 @@ echo -e "${ARROW} ${CYAN} Benchmarking hasn't completed, please wait until bench
 fi
 
 if [[ "$bench_benchmark" == "CUMULUS" || "$bench_benchmark" == "NIMBUS" || "$bench_benchmark" == "STRATUS" ]]; then
-echo -e "${CHECK_MARK} ${CYAN} Flux benchmark working correct, all requirements met.${NC}"
+echo -e "${CHECK_MARK} ${CYAN} Flux benchmark working correctly, all requirements are met.${NC}"
 fi
 
 if [[ "$bench_benchmark" == "failed" ]]; then
@@ -435,7 +435,7 @@ core=$($BENCH_CLI getbenchmarks | jq '.cores')
 
 if [[ "$bench_benchmark" == "failed" && "$core" > "0" ]]; then
 BTEST="1"
-echo -e "${X_MARK} ${CYAN} Flux benchmark working correct but minimum system requirements not met.${NC}"
+echo -e "${X_MARK} ${CYAN} Flux benchmark is working correctly but minimum system requirements are not met.${NC}"
 check_benchmarks "eps" "89.99" " CPU speed" "< 90.00 events per second"
 check_benchmarks "ddwrite" "159.99" " Disk write speed" "< 160.00 events per second"
 fi
@@ -451,7 +451,7 @@ fi
 ##fi
 #fi
 if [[ "$bench_back" == "disconnected" ]]; then
-echo -e "${X_MARK} ${CYAN} FluxBack does not work properly${NC}"
+echo -e "${X_MARK} ${CYAN} FluxBack is not working properly${NC}"
 
 
 
@@ -464,7 +464,7 @@ if [[ "$WANIP" != "" ]]; then
 
 back_error_check=$(curl -s -m 5 http://$WANIP:16127/zelid/loginphrase | jq -r .status )
 
-  if [[ "$back_error_check" != "success" &&  "$back_error_check" != "" ]]; then
+  if [[ "$back_error_check" != "Success" &&  "$back_error_check" != "" ]]; then
   
         back_error=$(curl -s -m 8 http://$WANIP:16127/zelid/loginphrase | jq -r .data.message.message 2>/dev/null )
 	
@@ -494,7 +494,7 @@ if [[ "$WANIP" != "" ]]; then
     echo -e "${CHECK_MARK} ${CYAN} Public IP(${GREEN}$WANIP${CYAN}) matches local device(${GREEN}$device_name${CYAN}) IP(${GREEN}$local_device_ip${CYAN})${NC}"
   else
    echo -e "${X_MARK} ${CYAN} Public IP(${GREEN}$WANIP${CYAN}) not matches local device(${GREEN}$device_name${CYAN}) IP${NC}"
-   echo -e "${ARROW} ${CYAN} If you under NAT use option 10 from multitoolbox (self-hosting)${NC}"
+   echo -e "${ARROW} ${CYAN} If you behind a NAT, use option 10 from multitoolbox (self-hosting)${NC}"
    ## dev_name=$(ip addr | grep 'BROADCAST,MULTICAST,UP,LOWER_UP' | head -n1 | awk '{print $2"0"}')
    ## sudo ip addr add "$WANPI" dev "$dev_name"
   # IP_FIX="1"
@@ -582,9 +582,9 @@ then
 
 if whiptail --yesno "Would you like to verify $CONFIG_FILE Y/N?" 8 60; then
 ZELCONF="1"
-zelnodeprivkey="$(whiptail --title "Deamon configuration" --inputbox "Enter your FluxNode Private Key generated by your Zelcore" 8 72 3>&1 1>&2 2>&3)"
-zelnodeoutpoint="$(whiptail --title "Deamon configuration" --inputbox "Enter your FluxNode Output TX ID" 8 72 3>&1 1>&2 2>&3)"
-zelnodeindex="$(whiptail --title "Deamon configuration" --inputbox "Enter your FluxNode Output Index" 8 60 3>&1 1>&2 2>&3)"
+zelnodeprivkey="$(whiptail --title "Deamon configuration" --inputbox "Enter your FluxNode private Key generated in Zelcore" 8 72 3>&1 1>&2 2>&3)"
+zelnodeoutpoint="$(whiptail --title "Deamon configuration" --inputbox "Enter your FluxNode output TX ID" 8 72 3>&1 1>&2 2>&3)"
+zelnodeindex="$(whiptail --title "Deamon configuration" --inputbox "Enter your FluxNode output index" 8 60 3>&1 1>&2 2>&3)"
 fi
 
 fi
@@ -639,9 +639,9 @@ fi
 
 		if [[ $conf == ?(-)+([0-9]) ]]; then
     			if [ "$conf" -ge "100" ]; then
-     			 echo -e "${CHECK_MARK} ${CYAN} Confirmations numbers >= 100($conf)${NC}"
+     			 echo -e "${CHECK_MARK} ${CYAN} Number of confirmations >= 100($conf)${NC}"
     			else
-      			echo -e "${X_MARK} ${CYAN} Confirmations numbers < 100($conf)${NC}"
+      			echo -e "${X_MARK} ${CYAN} Number of confirmations < 100($conf)${NC}"
    			 fi
 		else
 		echo -e "${X_MARK} ${CYAN} FluxNode outpoint is not valid${NC}"
@@ -724,16 +724,16 @@ fi
 
 
 echo -e "${NC}"
-echo -e "${BOOK} ${YELLOW}Checking listen ports:${NC}"
+echo -e "${BOOK} ${YELLOW}Checking listening ports:${NC}"
 check_listen_ports
 echo -e "${NC}"
-echo -e "${BOOK} ${YELLOW}File integration checking:${NC}"
+echo -e "${BOOK} ${YELLOW}Checking file integration:${NC}"
 integration
 echo -e ""
 #if ! whiptail --yesno "Detected IP address is $WANIP is this correct?" 8 60; then
    #WANIP=$(whiptail  --title "ZelNode ANALIZER/FiXER $SCVESION" --inputbox "        Enter IP address" 8 36 3>&1 1>&2 2>&3)
 #fi
-echo -e "${BOOK} ${YELLOW}Checking service:${NC}"
+echo -e "${BOOK} ${YELLOW}Checking services:${NC}"
 
 docker_working=0
 snap_docker_running=$(sudo systemctl status snap.docker.dockerd.service 2> /dev/null | grep 'running' | grep -o 'since.*')
@@ -792,11 +792,11 @@ fi
 verifity_mongod=0
 
 if sudo systemctl list-units | grep mongod | egrep -wi 'running' > /dev/null 2>&1; then
-echo -e "${CHECK_MARK} ${CYAN} MongoDB service running ${SEA}$mongod_running${NC}"
+echo -e "${CHECK_MARK} ${CYAN} MongoDB service is running ${SEA}$mongod_running${NC}"
 else
 
 if [[ "$mongod_inactive" != "" ]]; then
-echo -e "${X_MARK} ${CYAN} MongoDB service not running ${RED}$mongod_inactive${NC}"
+echo -e "${X_MARK} ${CYAN} MongoDB service is not running ${RED}$mongod_inactive${NC}"
 verifity_mongod=1
 else
 echo -e "${X_MARK} ${CYAN} MongoDB service is not installed${NC}"
@@ -805,10 +805,10 @@ fi
 fi
 
 if sudo systemctl list-units | grep zelcash | egrep -wi 'running' > /dev/null 2>&1; then
-echo -e "${CHECK_MARK} ${CYAN} Flux daemon service running ${SEA}$daemon_running${NC}"
+echo -e "${CHECK_MARK} ${CYAN} Flux daemon service is running ${SEA}$daemon_running${NC}"
 else
 if [[ "$daemon_inactive" != "" ]]; then
-echo -e "${X_MARK} ${CYAN} Flux daemon service not running ${RED}$daemon_inactive${NC}"
+echo -e "${X_MARK} ${CYAN} Flux daemon service is not running ${RED}$daemon_inactive${NC}"
 else
 echo -e "${X_MARK} ${CYAN} Flux daemon service is not installed${NC}"
 fi
