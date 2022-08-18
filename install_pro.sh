@@ -1115,7 +1115,9 @@ function bootstrap() {
     # r=$(shuf -i 0-$bootstrap_index -n 1)
     # indexb=${richable[$r]}
 
-    cdn_speedtest
+    if [[ -z $bootstrap_url || "$bootstrap_url" == "0" ]]; then
+      cdn_speedtest
+    fi
     # BOOTSTRAP_URL is now set in the above function
     # BOOTSTRAP_ZIP="http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
     BOOTSTRAP_ZIPFILE="flux_explorer_bootstrap.tar.gz"
