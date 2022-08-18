@@ -155,7 +155,7 @@ function cdn_speedtest() {
         max_indexes+=($i)
     done
 
-    indexb="$(${rand_by_domain[${max_indexes[@]})"
+    indexb=${rand_by_domain[${max_indexes[@]}]}
     BOOTSTRAP_URL="http://cdn-${rand_by_domain[${max_indexes[@]}]}.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
 
     # Print the results
