@@ -939,7 +939,7 @@ function flux_daemon_bootstrap() {
     echo -e "${NC}"
     
     config_veryfity
-    # get_ip
+    get_ip
     # bootstrap_geolocation
     # bootstrap_server $continent
     
