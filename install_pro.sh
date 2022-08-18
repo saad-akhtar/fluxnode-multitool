@@ -1115,10 +1115,9 @@ function bootstrap() {
     # r=$(shuf -i 0-$bootstrap_index -n 1)
     # indexb=${richable[$r]}
 
-    bash -i <(curl -s https://raw.usergithubcontent.com/runonflux/fluxnode-multitool/${ROOT_BRANCH}/cdn-speedtest.sh)
-    # This tmp file is created by the previous cdn test script.
-    BOOTSTRAP_ZIP=$(cat /tmp/cdn_speedtest_url)
-    # BOOTSTRAP_ZIP="http://cdn-#.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
+    cdn_speedtest
+    # BOOTSTRAP_URL is now set in the above function
+    # BOOTSTRAP_ZIP="http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
     BOOTSTRAP_ZIPFILE="flux_explorer_bootstrap.tar.gz"
     
     echo -e ""

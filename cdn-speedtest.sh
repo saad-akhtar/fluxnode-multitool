@@ -26,13 +26,12 @@ for i in "${!size_list[@]}"; do
     max_indexes+=($i)
 done
 
-bestServer="http://cdn-${rand_by_domain[${max_indexes[@]}]}.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
+BOOTSTRAP_URL="http://cdn-${rand_by_domain[${max_indexes[@]}]}.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
+BOOTSTRAP_URL=$bestServer
 
 # Print the results
 mb=$(bc <<<"scale=2; $arr_max / 1048576 / 4" | awk '{printf "%2.2f\n", $1}')
 echo -e ""
 echo -e "${YELLOW}Best server is: ${GREEN}cdn-${YELLOW}${rand_by_domain[${max_indexes[0]}]} ${GREEN}Average speed: ${YELLOW}$mb ${GREEN}MB/s${NC}"
-echo -e "${CHECK_MARK} ${GREEN}Fastest Server: ${YELLOW}$bestServer${NC}"
+echo -e "${CHECK_MARK} ${GREEN}Fastest Server: ${YELLOW}$BOOTSTRAP_URL${NC}"
 echo -e ""
-
-echo $bestServer > /tmp/cdn_speedtest_url
