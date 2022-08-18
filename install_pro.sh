@@ -1103,20 +1103,20 @@ function bootstrap() {
          return 1
     fi
 
-    bootstrap_geolocation
+    # bootstrap_geolocation
     
-    if [[ "$Server_offline" == "1" ]]; then
-     echo -e "${WORNING} ${CYAN}All Bootstrap server offline, operation aborted.. ${NC}" && sleep 1
-     echo -e ""
-     return 1
-    fi
+    # if [[ "$Server_offline" == "1" ]]; then
+    #  echo -e "${WORNING} ${CYAN}All Bootstrap server offline, operation aborted.. ${NC}" && sleep 1
+    #  echo -e ""
+    #  return 1
+    # fi
        
-    bootstrap_index=$((${#richable[@]}-1))
-    r=$(shuf -i 0-$bootstrap_index -n 1)
-    indexb=${richable[$r]}
+    # bootstrap_index=$((${#richable[@]}-1))
+    # r=$(shuf -i 0-$bootstrap_index -n 1)
+    # indexb=${richable[$r]}
     
-    BOOTSTRAP_ZIP="http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
-    BOOTSTRAP_ZIPFILE="${BOOTSTRAP_ZIP##*/}"
+    # BOOTSTRAP_ZIP="http://cdn-#.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
+    BOOTSTRAP_ZIPFILE="flux_explorer_bootstrap.tar.gz"
     
     echo -e ""
     echo -e "${ARROW} ${YELLOW}Restore daemon chain from bootstrap${NC}"
@@ -1192,6 +1192,10 @@ function bootstrap() {
 		
 		echo -e "${ARROW} ${CYAN}Flux daemon bootstrap height: ${GREEN}$DB_HIGHT${NC}"
 	 	echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"
+          # HERE WE NEED TO REPLACE THE GEOLOCATION HERE
+          bash -i <(curl -s https://raw.usergithubcontent.com/runonflux/fluxnode-multitool/${ROOT_BRANCH}/cdn-speedtest.sh)
+          # This tmp file is created by the previous cdn test script.
+          BOOTSTRAP_ZIP=$(cat /tmp/cdn_speedtest_url)
        		wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
 	        tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
 		sleep 2

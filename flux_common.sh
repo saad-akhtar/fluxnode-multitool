@@ -20,6 +20,7 @@ ARROW="${SEA}\xE2\x96\xB6${NC}"
 BOOK="${RED}\xF0\x9F\x93\x8B${NC}"
 HOT="${ORANGE}\xF0\x9F\x94\xA5${NC}"
 WORNING="${RED}\xF0\x9F\x9A\xA8${NC}"
+RIGHT_ANGLE="${GREEN}\xE2\x88\x9F${NC}"
 
 #bootstrap settings
 BOOTSTRAP_ZIPFILE='flux_explorer_bootstrap.tar.gz'
