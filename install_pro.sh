@@ -1114,7 +1114,10 @@ function bootstrap() {
     # bootstrap_index=$((${#richable[@]}-1))
     # r=$(shuf -i 0-$bootstrap_index -n 1)
     # indexb=${richable[$r]}
-    
+
+    bash -i <(curl -s https://raw.usergithubcontent.com/runonflux/fluxnode-multitool/${ROOT_BRANCH}/cdn-speedtest.sh)
+    # This tmp file is created by the previous cdn test script.
+    BOOTSTRAP_ZIP=$(cat /tmp/cdn_speedtest_url)
     # BOOTSTRAP_ZIP="http://cdn-#.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
     BOOTSTRAP_ZIPFILE="flux_explorer_bootstrap.tar.gz"
     
@@ -1122,190 +1125,150 @@ function bootstrap() {
     echo -e "${ARROW} ${YELLOW}Restore daemon chain from bootstrap${NC}"
     
     if [[ -z "$bootstrap_url" ]]; then
-
-      
-        if [[ -e ~/$CONFIG_DIR/blocks ]] && [[ -e ~/$CONFIG_DIR/chainstate ]]; then
-            echo -e "${ARROW} ${CYAN}Cleaning...${NC}"
-            rm -rf ~/$CONFIG_DIR/blocks ~/$CONFIG_DIR/chainstate ~/$CONFIG_DIR/determ_zelnodes
-	
-        fi
+      if [[ -e ~/$CONFIG_DIR/blocks ]] && [[ -e ~/$CONFIG_DIR/chainstate ]]; then
+          echo -e "${ARROW} ${CYAN}Cleaning...${NC}"
+          rm -rf ~/$CONFIG_DIR/blocks ~/$CONFIG_DIR/chainstate ~/$CONFIG_DIR/determ_zelnodes
+      fi
 
 
-        if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then		   
-	
-            if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
-	
-                echo -e "${ARROW} ${YELLOW}Local bootstrap file detected...${NC}"
-	        echo -e "${ARROW} ${YELLOW}Checking if zip file is corrupted...${NC}"
-                if unzip -t $BOOTSTRAP_ZIPFILE | grep 'No errors' > /dev/null 2>&1
-                then
-                    echo -e "${ARROW} ${CYAN}Bootstrap zip file is valid.............[${CHECK_MARK}${CYAN}]${NC}"
-                else
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   echo -e "${ARROW} ${CYAN}Bootstrap file is corrupted.............[${X_MARK}${CYAN}]${NC}"
-                   rm -rf $BOOTSTRAP_ZIPFILE
-               fi
-	    
-	    else	    
-                check_tar "/home/$USER/$BOOTSTRAP_ZIPFILE"
-	    fi
-	    
-	fi
+      if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then		   
 
+        if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
 
-        if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
-	
-	
-            if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
-	        echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
-                unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+          echo -e "${ARROW} ${YELLOW}Local bootstrap file detected...${NC}"
+          echo -e "${ARROW} ${YELLOW}Checking if zip file is corrupted...${NC}"
+            if unzip -t $BOOTSTRAP_ZIPFILE | grep 'No errors' > /dev/null 2>&1
+            then
+              echo -e "${ARROW} ${CYAN}Bootstrap zip file is valid.............[${CHECK_MARK}${CYAN}]${NC}"
             else
-                tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
-                sleep 2  
-	    fi
-	
-        else
-
-
-            CHOICE=$(
-            whiptail --title "FLUXNODE INSTALLATION" --menu "Choose a method how to get bootstrap file" 10 47 2  \
-                "1)" "Download from source build in script" \
-                "2)" "Download from own source" 3>&2 2>&1 1>&3
-            )
-
-
-            case $CHOICE in
-	    "1)")   
-	        
-	        DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
-		if [[ "$DB_HIGHT" == "" ]]; then
-		  DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
-		fi
-		
-		
-		
-		
-		echo -e "${ARROW} ${CYAN}Flux daemon bootstrap height: ${GREEN}$DB_HIGHT${NC}"
-	 	echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"
-          # HERE WE NEED TO REPLACE THE GEOLOCATION HERE
-          bash -i <(curl -s https://raw.usergithubcontent.com/runonflux/fluxnode-multitool/${ROOT_BRANCH}/cdn-speedtest.sh)
-          # This tmp file is created by the previous cdn test script.
-          BOOTSTRAP_ZIP=$(cat /tmp/cdn_speedtest_url)
-       		wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
-	        tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
-		sleep 2
-        	#unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
-
-
-	    ;;
-	    "2)")   
-  		BOOTSTRAP_ZIP="$(whiptail --title "Flux daemon bootstrap setup" --inputbox "Enter your URL (zip, tar.gz)" 8 72 3>&1 1>&2 2>&3)"
-		echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"		
-		BOOTSTRAP_ZIPFILE="${BOOTSTRAP_ZIP##*/}"
-		wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
-		
-	        if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
- 		    echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
-                    unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
-		else	       
-		    tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
-		    sleep 2
-		fi
-		#echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
-		#unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
-	    ;;
-            esac
-
-        fi
-
-    else
-
-        if [[ -e ~/$CONFIG_DIR/blocks ]] && [[ -e ~/$CONFIG_DIR/chainstate ]]; then
-            echo -e "${ARROW} ${CYAN}Cleaning...${NC}"
-            rm -rf ~/$CONFIG_DIR/blocks ~/$CONFIG_DIR/chainstate ~/$CONFIG_DIR/determ_zelnodes
-        fi
-
-        if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
-	
-            if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
-	
-                echo -e "${ARROW} ${YELLOW}Local bootstrap file detected...${NC}"
-	        echo -e "${ARROW} ${YELLOW}Checking if zip file is corrupted...${NC}"
-                if unzip -t $BOOTSTRAP_ZIPFILE | grep 'No errors' > /dev/null 2>&1
-                then
-                    echo -e "${ARROW} ${CYAN}Bootstrap zip file is valid.............[${CHECK_MARK}${CYAN}]${NC}"
-                else
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   printf '\e[A\e[K'
-                   echo -e "${ARROW} ${CYAN}Bootstrap file is corrupted.............[${X_MARK}${CYAN}]${NC}"
-                   rm -rf $BOOTSTRAP_ZIPFILE
-               fi
-	    
-	    else	    
-                check_tar "/home/$USER/$BOOTSTRAP_ZIPFILE"
-	    fi
-	    
-	fi
-
-
-        if [[ "$bootstrap_url" == "0" ]]; then
-
-            if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
-
-                if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
-	            echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
-                    unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
-                else
-                    tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
-                    sleep 2  
-	        fi
-		
-            else
-	    
-	        DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
-		if [[ "$DB_HIGHT" == "" ]]; then
-		  DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
-		fi
-		
-		
-		echo -e "${ARROW} ${CYAN}Flux daemon bootstrap height: ${GREEN}$DB_HIGHT${NC}"
-                echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"
-                wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
-		tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
-		sleep 2
-
-	    fi
-	    
-        else
-	
-            if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
-                tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
-		sleep 2
-            else
-                BOOTSTRAP_ZIP="$bootstrap_url"
-                echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"           
-		BOOTSTRAP_ZIPFILE="${BOOTSTRAP_ZIP##*/}"
-		wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
-		
-	        if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
- 		    echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
-                    unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
-		else	       
-		    tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
-		    sleep 2
-		fi	
-		
+              printf '\e[A\e[K'
+              printf '\e[A\e[K'
+              printf '\e[A\e[K'
+              printf '\e[A\e[K'
+              printf '\e[A\e[K'
+              printf '\e[A\e[K'
+              echo -e "${ARROW} ${CYAN}Bootstrap file is corrupted.............[${X_MARK}${CYAN}]${NC}"
+              rm -rf $BOOTSTRAP_ZIPFILE
             fi
+
+          else	    
+          check_tar "/home/$USER/$BOOTSTRAP_ZIPFILE"
         fi
+      fi
+      if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
+        if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
+          echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
+          unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+        else
+          tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
+          sleep 2  
+        fi
+      else
+
+
+        CHOICE=$(
+        whiptail --title "FLUXNODE INSTALLATION" --menu "Choose a method how to get bootstrap file" 10 47 2  \
+            "1)" "Download from source build in script" \
+            "2)" "Download from own source" 3>&2 2>&1 1>&3
+        )
+
+
+        case $CHOICE in
+          "1)")   
+            DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
+            if [[ "$DB_HIGHT" == "" ]]; then
+              DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
+            fi
+            echo -e "${ARROW} ${CYAN}Flux daemon bootstrap height: ${GREEN}$DB_HIGHT${NC}"
+            echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"
+            wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
+            tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
+            sleep 2
+            #unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+          ;;
+          "2)")   
+            BOOTSTRAP_ZIP="$(whiptail --title "Flux daemon bootstrap setup" --inputbox "Enter your URL (zip, tar.gz)" 8 72 3>&1 1>&2 2>&3)"
+            echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"		
+            BOOTSTRAP_ZIPFILE="${BOOTSTRAP_ZIP##*/}"
+            wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
+            if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
+              echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
+              unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+            else	       
+              tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
+              sleep 2
+            fi
+            #echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
+            #unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+          ;;
+        esac
+      fi
+    else
+      if [[ -e ~/$CONFIG_DIR/blocks ]] && [[ -e ~/$CONFIG_DIR/chainstate ]]; then
+          echo -e "${ARROW} ${CYAN}Cleaning...${NC}"
+          rm -rf ~/$CONFIG_DIR/blocks ~/$CONFIG_DIR/chainstate ~/$CONFIG_DIR/determ_zelnodes
+      fi
+
+      if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
+        if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
+          echo -e "${ARROW} ${YELLOW}Local bootstrap file detected...${NC}"
+          echo -e "${ARROW} ${YELLOW}Checking if zip file is corrupted...${NC}"
+          if unzip -t $BOOTSTRAP_ZIPFILE | grep 'No errors' > /dev/null 2>&1
+          then
+          echo -e "${ARROW} ${CYAN}Bootstrap zip file is valid.............[${CHECK_MARK}${CYAN}]${NC}"
+          else
+            printf '\e[A\e[K'
+            printf '\e[A\e[K'
+            printf '\e[A\e[K'
+            printf '\e[A\e[K'
+            printf '\e[A\e[K'
+            printf '\e[A\e[K'
+            echo -e "${ARROW} ${CYAN}Bootstrap file is corrupted.............[${X_MARK}${CYAN}]${NC}"
+            rm -rf $BOOTSTRAP_ZIPFILE
+          fi
+        else	    
+        check_tar "/home/$USER/$BOOTSTRAP_ZIPFILE"
+        fi
+      fi
+
+      if [[ "$bootstrap_url" == "0" ]]; then
+        if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
+          if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
+            echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
+            unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+          else
+            tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
+            sleep 2  
+          fi
+        else
+          DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
+          if [[ "$DB_HIGHT" == "" ]]; then
+            DB_HIGHT=$(curl -sSL -m 10 http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json | jq -r '.block_height' 2>/dev/null)
+          fi
+          echo -e "${ARROW} ${CYAN}Flux daemon bootstrap height: ${GREEN}$DB_HIGHT${NC}"
+          echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"
+          wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
+          tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
+          sleep 2
+        fi
+      else
+        if [ -f "/home/$USER/$BOOTSTRAP_ZIPFILE" ]; then
+          tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR" 
+          sleep 2
+        else
+          BOOTSTRAP_ZIP="$bootstrap_url"
+          echo -e "${ARROW} ${YELLOW}Downloading File: ${GREEN}$BOOTSTRAP_ZIP ${NC}"           
+          BOOTSTRAP_ZIPFILE="${BOOTSTRAP_ZIP##*/}"
+          wget --tries 5 -O $BOOTSTRAP_ZIPFILE $BOOTSTRAP_ZIP -q --show-progress
+          if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
+            echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
+            unzip -o $BOOTSTRAP_ZIPFILE -d /home/$USER/$CONFIG_DIR > /dev/null 2>&1
+          else	       
+            tar_file_unpack "/home/$USER/$BOOTSTRAP_ZIPFILE" "/home/$USER/$CONFIG_DIR"
+            sleep 2
+          fi	
+        fi
+      fi
     fi
 
     if [[ -z "$bootstrap_zip_del" ]]; then
@@ -1313,16 +1276,10 @@ function bootstrap() {
             rm -rf $BOOTSTRAP_ZIPFILE
       #  fi
     else
-
-        if [[ "$bootstrap_zip_del" == "1" ]]; then
-          rm -rf $BOOTSTRAP_ZIPFILE
-        fi
-  
+      if [[ "$bootstrap_zip_del" == "1" ]]; then
+        rm -rf $BOOTSTRAP_ZIPFILE
+      fi
     fi
-     
-    
-
-
 }
 
 
