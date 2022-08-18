@@ -939,21 +939,22 @@ function flux_daemon_bootstrap() {
     echo -e "${NC}"
     
     config_veryfity
-    get_ip
-    bootstrap_geolocation
-    bootstrap_server $continent
+    # get_ip
+    # bootstrap_geolocation
+    # bootstrap_server $continent
     
     
-    if [[ "$Server_offline" == "1" ]]; then
-     echo -e "${WORNING} ${CYAN}All Bootstrap server offline, operation aborted.. ${NC}" && sleep 1
-     echo -e ""
-     exit
-    fi
+    # if [[ "$Server_offline" == "1" ]]; then
+    #  echo -e "${WORNING} ${CYAN}All Bootstrap server offline, operation aborted.. ${NC}" && sleep 1
+    #  echo -e ""
+    #  exit
+    # fi
        
-    bootstrap_index=$((${#richable[@]}-1))
-    r=$(shuf -i 0-$bootstrap_index -n 1)
-    indexb=${richable[$r]}
-    BOOTSTRAP_ZIP="http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
+    # bootstrap_index=$((${#richable[@]}-1))
+    # r=$(shuf -i 0-$bootstrap_index -n 1)
+    # indexb=${richable[$r]}
+    # BOOTSTRAP_ZIP="http://cdn-$indexb.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz"
+    cdn_speedtest
     BOOTSTRAP_ZIPFILE="${BOOTSTRAP_ZIP##*/}"
     
     pm2 stop watchdog > /dev/null 2>&1 && sleep 2
