@@ -136,7 +136,7 @@ function cdn_speedtest() {
     i=0
     len=${#rand_by_domain[@]}
     echo -e ""
-    echo -e "${YELLOW}Running quick download speed test for flux_explorer_bootstrap...${NC}"
+    echo -e "${ARROW} ${YELLOW}Running quick download speed test for flux_explorer_bootstrap...${NC}"
     while [ $i -lt $len ];
     do
         testing=$(curl -m 4 http://cdn-${rand_by_domain[$i]}.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.tar.gz  --output testspeed -fail --silent --show-error 2>&1)
@@ -162,7 +162,7 @@ function cdn_speedtest() {
     mb=$(bc <<<"scale=2; $arr_max / 1048576 / 4" | awk '{printf "%2.2f\n", $1}')
     echo -e ""
     echo -e "${YELLOW}Best server is: ${GREEN}cdn-${YELLOW}${rand_by_domain[${max_indexes[0]}]} ${GREEN}Average speed: ${YELLOW}$mb ${GREEN}MB/s${NC}"
-    echo -e "${CHECK_MARK} ${GREEN}Fastest Server: ${YELLOW}$BOOTSTRAP_URL${NC}"
+    echo -e "${CHECK_MARK} ${GREEN}Fastest Server: ${YELLOW}$BOOTSTRAP_ZIP${NC}"
     echo -e ""
 }
 
